@@ -8,7 +8,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from ZSI import TC, EvaluateException, FaultFromZSIException, \
     SoapWriter, Fault, FaultFromException, UNICODE_ENCODING, ParsedSoap, \
     ParseException
-from ZSI import _child_elements, _seqtypes, _find_arraytype, _find_type, resolvers
+from ZSI import _child_elements, _seqtypes, _find_arraytype, _find_type
 from ZSI.auth import ClientBinding
 
 
@@ -217,13 +217,8 @@ class SOAPRequestHandler(BaseHTTPRequestHandler):
         '''
         try:
             ct = self.headers['content-type']
-            if ct.startswith('multipart/'):
-                cid = resolvers.MIMEResolver(ct, self.rfile)
-                xml = cid.GetSOAPPart()
-                ps = ParsedSoap(xml, resolver=cid.Resolve)
-            else:
-                length = int(self.headers['content-length'])
-                ps = ParsedSoap(self.rfile.read(length))
+            length = int(self.headers['content-length'])
+            ps = ParsedSoap(self.rfile.read(length))
         except ParseException as e:
             self.send_fault(FaultFromZSIException(e))
             return
@@ -255,13 +250,8 @@ def AsCGI(nsdict={}, typesmodule=None, rpc=False, modules=None):
         return
     ct = os.environ['CONTENT_TYPE']
     try:
-        if ct.startswith('multipart/'):
-            cid = resolvers.MIMEResolver(ct, sys.stdin)
-            xml = cid.GetSOAPPart()
-            ps = ParsedSoap(xml, resolver=cid.Resolve)
-        else:
-            length = int(os.environ['CONTENT_LENGTH'])
-            ps = ParsedSoap(sys.stdin.read(length))
+        length = int(os.environ['CONTENT_LENGTH'])
+        ps = ParsedSoap(sys.stdin.read(length))
     except ParseException as e:
         _CGISendFault(FaultFromZSIException(e))
         return
@@ -284,13 +274,8 @@ def AsJonPy(request=None, modules=None, **kw):
         return
     ct = request.environ['CONTENT_TYPE']
     try:
-        if ct.startswith('multipart/'):
-            cid = resolvers.MIMEResolver(ct, request.stdin)
-            xml = cid.GetSOAPPart()
-            ps = ParsedSoap(xml, resolver=cid.Resolve)
-        else:
-            length = int(request.environ['CONTENT_LENGTH'])
-            ps = ParsedSoap(request.stdin.read(length))
+        length = int(request.environ['CONTENT_LENGTH'])
+        ps = ParsedSoap(request.stdin.read(length))
     except ParseException as e:
         _JonPySendFault(FaultFromZSIException(e), **kw)
         return
