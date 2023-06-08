@@ -6,7 +6,8 @@
 import urllib.parse, sys, _thread,re
 from http.server import HTTPServer
 from ZSI import ParseException, FaultFromException, FaultFromZSIException, Fault
-from ZSI import _get_element_nsuri_name, resolvers
+#from ZSI import _get_element_nsuri_name, resolvers
+from ZSI import _get_element_nsuri_name
 from ZSI import _get_idstr
 from ZSI.address import Address
 from ZSI.parse import ParsedSoap
@@ -202,7 +203,7 @@ class ServiceInterface:
             self.soapAction.get(action)
         if method is None:
             raise UnknownRequestException(
-                'failed to map request to a method: action(%s), root%s' 
+                'failed to map request to a method: action(%s), root%s'
                 %(action,_get_element_nsuri_name(ps.body_root)))
         return method
 
@@ -278,16 +279,16 @@ class WSAResource(ServiceSOAPBinding):
             soapAction = soapAction.strip('\'"')
         post = post.strip('\'"')
         try:
-            ct = self.headers['content-type']
-            if ct.startswith('multipart/'):
-                cid = resolvers.MIMEResolver(ct, self.rfile)
-                xml = cid.GetSOAPPart()
-                #ps = ParsedSoap(xml, resolver=cid.Resolve, readerclass=DomletteReader)
-                ps = ParsedSoap(xml, resolver=cid.Resolve)
-            else:
-                length = int(self.headers['content-length'])
-                #ps = ParsedSoap(self.rfile.read(length), readerclass=DomletteReader)
-                ps = ParsedSoap(self.rfile.read(length))
+            #ct = self.headers['content-type']
+            # if ct.startswith('multipart/'):
+            #     cid = resolvers.MIMEResolver(ct, self.rfile)
+            #     xml = cid.GetSOAPPart()
+            #     #ps = ParsedSoap(xml, resolver=cid.Resolve, readerclass=DomletteReader)
+            #     ps = ParsedSoap(xml, resolver=cid.Resolve)
+            # else:
+            length = int(self.headers['content-length'])
+            #ps = ParsedSoap(self.rfile.read(length), readerclass=DomletteReader)
+            ps = ParsedSoap(self.rfile.read(length))
         except ParseException as e:
             self.send_fault(FaultFromZSIException(e))
         except Exception as e:
@@ -326,15 +327,15 @@ class SOAPRequestHandler(BaseSOAPRequestHandler):
             soapAction = soapAction.strip('\'"')
         post = post.strip('\'"')
         try:
-            ct = self.headers['content-type']
-            if ct.startswith('multipart/'):
-                cid = resolvers.MIMEResolver(ct, self.rfile)
-                xml = cid.GetSOAPPart()
-                ps = ParsedSoap(xml, resolver=cid.Resolve)
-            else:
-                length = int(self.headers['content-length'])
-                xml = self.rfile.read(length)
-                ps = ParsedSoap(xml)
+            #ct = self.headers['content-type']
+            #if ct.startswith('multipart/'):
+            #    cid = resolvers.MIMEResolver(ct, self.rfile)
+            #    xml = cid.GetSOAPPart()
+            #    ps = ParsedSoap(xml, resolver=cid.Resolve)
+            #else:
+            length = int(self.headers['content-length'])
+            xml = self.rfile.read(length)
+            ps = ParsedSoap(xml)
         except ParseException as e:
             self.send_fault(FaultFromZSIException(e))
         except Exception as e:
@@ -491,7 +492,7 @@ class SimpleWSResource(ServiceSOAPBinding):
         node = self.getNode(post)
         if node is None:
             raise Exception
-            
+
         if node.authorize(None, post, action):
             return node.getOperation(ps, action)
         else:
