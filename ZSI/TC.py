@@ -17,7 +17,7 @@ from ZSI.wstools.logging import getLogger as _GetLogger
 
 import re, types, time, copy
 
-from base64 import decodestring as b64decode, encodestring as b64encode
+from base64 import decodebytes as b64decode, encodebytes as b64encode
 from urllib.parse import unquote as urldecode, quote as urlencode
 from binascii import unhexlify as hexdecode, hexlify as hexencode
 try:
@@ -1302,8 +1302,8 @@ class XML(TypeCode):
         ## copy xmlns: attributes into appended node
         parent = pyobj.parentNode
         while parent.nodeType == _Node.ELEMENT_NODE:
-            for attr in [a for a in parent.attributes 
-                        if a.name.startswith('xmlns:') 
+            for attr in [a for a in parent.attributes
+                        if a.name.startswith('xmlns:')
                         and a.name not in list(child.attributes.keys())]:
                 child.setAttributeNode(attr.cloneNode(1))
 
@@ -1533,7 +1533,7 @@ class Union(SimpleType):
         if len(self.memberTypeCodes) > 0:
             return
         if self.__class__.memberTypes is None:
-            raise EvaluateException("uninitialized class variable memberTypes " 
+            raise EvaluateException("uninitialized class variable memberTypes "
                                     "[(namespace,name),]")
         for nsuri,name in self.__class__.memberTypes:
             tcclass = GTD(nsuri,name)
